@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 class Employee {
 
     double salary;
@@ -10,7 +12,6 @@ class Employee {
         System.out.println("Salary before hike: " + salary);
     }
 }
-
 
 class FullTimeEmployee extends Employee {
 
@@ -39,16 +40,49 @@ class InternEmployee extends Employee {
 }
 
 public class Assignment2 {
+
     public static void main(String[] args) {
 
-        FullTimeEmployee f1 = new FullTimeEmployee(40000);
-        f1.displaySalary();
-        f1.calculateSalary();
+        Scanner sc = new Scanner(System.in);
+        int choice;
 
-        System.out.println();
+        do {
+            System.out.println("\n===== Employee Menu =====");
+            System.out.println("1. Full Time Employee");
+            System.out.println("2. Intern Employee");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
 
-        InternEmployee i1 = new InternEmployee(20000);
-        i1.displaySalary();
-        i1.calculateSalary();
+            switch (choice) {
+
+                case 1:
+                    System.out.print("Enter salary for Full Time Employee: ");
+                    double fullSalary = sc.nextDouble();
+                    FullTimeEmployee f1 = new FullTimeEmployee(fullSalary);
+                    f1.displaySalary();
+                    f1.calculateSalary();
+                    break;
+
+                case 2:
+                    System.out.print("Enter salary for Intern Employee: ");
+                    double internSalary = sc.nextDouble();
+                    InternEmployee i1 = new InternEmployee(internSalary);
+                    i1.displaySalary();
+                    i1.calculateSalary();
+                    break;
+
+                case 3:
+                    System.out.println("Exiting program...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+
+        } while (choice != 3);
+
+        sc.close();
     }
 }
+
