@@ -1,86 +1,158 @@
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+
+// Customer class
+class Customer implements Serializable {
+    int cid;
+    String name;
+    double amount;
+
+    Customer(int cid, String name, double amount) {
+        this.cid = cid;
+        this.name = name;
+        this.amount = amount;
+    }
+
+    void display() {
+        System.out.println(cid + " " + name + " " + amount);
+    }
+}
 
 public class Assignment4 {
+    public static void main(String[] args) throws Exception {
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int c;
-        String filename = "file.txt";
+        Scanner sc = new Scanner(System.in);
+        ArrayList<Customer> list = new ArrayList<>();
+        int choice;
 
         do {
-            System.out.println("\nFile Operations");
-            System.out.println("1.To write in a file");
-            System.out.println("2.To read in a file");
-            System.out.println("3.To append in a file");
-            System.out.println("4. Exit");
-            System.out.print("Enter your choice: ");
-            c = scanner.nextInt();
-            scanner.nextLine(); 
+            System.out.println("\n1.Create\n2.Deposit\n3.Withdraw\n4.Display\n5.Exit");
+            choice = sc.nextInt();
 
-            switch (c) {
+            try {
+                switch (choice) {
 
-                case 1:
-                    try {
-                        FileWriter fw = new FileWriter(filename);
-                        System.out.print("Enter your text to write in a file: ");
-                        String data = scanner.nextLine();
-                        fw.write(data);
-                        fw.close();
-                        System.out.println("Data written!");
-                    } catch (IOException error_w) {
-                        System.out.println("Error in writing the file: " + error_w.getMessage());
-                    } finally {
-                        System.out.println("Writing completed");
-                    }
-                    break;
+                    
+                    case 1:
+                        System.out.print("Enter CID (1-20): ");
+                        int cid = sc.nextInt();
 
-                case 2:
-                    try {
-                        FileReader fr = new FileReader(filename);
-                        BufferedReader br = new BufferedReader(fr);
+                        if (cid < 1 || cid > 20)
+                            throw new Exception("Invalid CID");
 
-                        String line;
-                        System.out.println("\nFile Content is:");
-                        while ((line = br.readLine()) != null) {
-                            System.out.println(line);
+                     
+                        boolean exists = false;
+                        for (Customer c : list) {
+                            if (c.cid == cid) {
+                                exists = true;
+                                break;
+                            }
                         }
 
-                        br.close();
-                    } catch (FileNotFoundException e) {
-                        System.out.println("File not found!");
-                    } catch (IOException error_r) {
-                        System.out.println("Error in reading the file: " + error_r.getMessage());
-                    } finally {
-                        System.out.println("Reading completed!");
-                    }
-                    break;
+                        if (exists)
+                            throw new Exception("CID already exists");
 
-                case 3:
-                    try {
-                        FileWriter fw = new FileWriter(filename, true); // append mode
-                        System.out.print("Enter your text to append: ");
-                        String data = scanner.nextLine();
-                        fw.write("\n" + data);
-                        fw.close();
-                        System.out.println("Appedning successful!");
-                    } catch (IOException error_a) {
-                        System.out.println("Error appending file: " + error_a.getMessage());
-                    } finally {
-                        System.out.println("Appending completed!");
-                    }
-                    break;
+                        System.out.print("Enter Name: ");
+                        String name = sc.next();
 
-                case 4:
-                    System.out.println("Exiting the code...");
-                    break;
+                        System.out.print("Enter Amount: ");
+                        double amt = sc.nextDouble();
 
-                default:
-                    System.out.println("Invalid!");
+                        if (amt < 0)
+                            throw new Exception("Amount must be positive");
+
+                        if (amt < 1000)
+                            throw new Exception("Minimum balance is 1000");
+
+                        list.add(new Customer(cid, name, amt));
+                        System.out.println("Account Created Successfully!");
+                        break;
+
+                   
+                    case 2:
+                        System.out.print("Enter CID: ");
+                        int d = sc.nextInt();
+
+                        System.out.print("Enter amount: ");
+                        double dep = sc.nextDouble();
+
+                        if (dep <= 0)
+                            throw new Exception("Invalid amount");
+
+                        boolean foundDeposit = false;
+                        for (Customer c : list) {
+                            if (c.cid == d) {
+                                c.amount += dep;
+                                foundDeposit = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundDeposit)
+                            System.out.println("Customer not found");
+                        else
+                            System.out.println("Deposit Successful!");
+                        break;
+
+                    
+                    case 3:
+                        System.out.print("Enter CID: ");
+                        int w = sc.nextInt();
+
+                        System.out.print("Enter amount: ");
+                        double wd = sc.nextDouble();
+
+                        if (wd <= 0)
+                            throw new Exception("Invalid amount");
+
+                        boolean foundWithdraw = false;
+                        for (Customer c : list) {
+                            if (c.cid == w) {
+                                if (wd > c.amount)
+                                    throw new Exception("Insufficient balance");
+
+                                c.amount -= wd;
+                                foundWithdraw = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundWithdraw)
+                            System.out.println("Customer not found");
+                        else
+                            System.out.println("Withdrawal Successful!");
+                        break;
+
+                    
+                    case 4:
+                        if (list.isEmpty()) {
+                            System.out.println("No records found");
+                        } else {
+                            for (Customer c : list) {
+                                c.display();
+                            }
+                        }
+                        break;
+
+                    case 5:
+                        System.out.println("Exiting...");
+                        break;
+
+                    default:
+                        System.out.println("Invalid choice");
+                }
+
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
 
-        } while (c != 4);
+        } while (choice != 5);
 
-        scanner.close();
+        
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("data.txt"));
+        oos.writeObject(list);
+        oos.close();
+
+        System.out.println("Data saved to file.");
     }
 }
